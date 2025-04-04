@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTrace - Đăng nhập</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" href="login.css"> <!-- Giữ file CSS tùy chỉnh nếu cần -->
+</head>
+<body>
+    <div class="container">
+        <div class="form-container active d-flex justify-content-center h-100">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Đăng nhập</h2>
+                    <div class="d-flex justify-content-end social_icon">
+                        <span><i class="fab fa-facebook-square"></i></span>
+                        <span><i class="fab fa-google-plus-square"></i></span>
+                        <span><i class="fab fa-twitter-square"></i></span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="loginForm">
+                        <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            </div>
+                            <input type="text" class="form-control" name="username" placeholder="Tên đăng nhập" required>
+                        </div>
+                        <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                            </div>
+                            <input type="password" class="form-control" name="password" placeholder="Mật khẩu" required>
+                        </div>
+                        <div class="row align-items-center remember mt-3">
+                            <input type="checkbox"> Ghi nhớ tôi
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn float-right login_btn">Đăng nhập</button>
+                        </div>
+                        <div class="text-center mt-3">
+                            <p style="color: azure;">Chưa có tài khoản? <a href="cutstomer_register.html">Đăng ký</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            console.log('Gửi yêu cầu đăng nhập:', data);
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            console.log('Phản hồi từ /login:', result);
+            if (result.redirect) {
+                window.location.href = result.redirect; // Chuyển hướng dựa trên server
+            } else {
+                alert(result.message);
+            }
+        });
+    </script>
+</body>
+</html>

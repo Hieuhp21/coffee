@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTrace - Dashboard</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>CoffeeTrace</h2>
+            <ul>
+                <li><a href="/dashboard" class="active">Trang chủ</a></li>
+                <% if (role === 'farmer') { %>
+                    <li><a href="/farmer/info">Thông tin nông dân</a></li>
+                    <li><a href="/farmer/care">Chăm sóc</a></li>
+                    <li><a href="/farmer/harvest">Thu hoạch</a></li>
+                    <li><a href="/farmer/export">Xuất hàng</a></li>
+                    <li><a href="/farmer/history">Lịch sử</a></li>
+                <% } else if (role === 'processor') { %>
+                    <li><a href="/processor/info">Thông tin nhà máy</a></li>
+                    <li><a href="/processor/quality">Kiểm tra chất lượng</a></li>
+                    <li><a href="/processor/process">Chế biến</a></li>
+                    <li><a href="/processor/storage">Lưu kho</a></li>
+                    <li><a href="/processor/history">Lịch sử</a></li>
+                <% } else if (role === 'packer') { %>
+                    <li><a href="/packer/info">Thông tin xưởng</a></li>
+                    <li><a href="/packer/pack">Đóng gói</a></li>
+                    <li><a href="/packer/storage">Lưu kho</a></li>
+                    <li><a href="/packer/history">Lịch sử</a></li>
+                <% } else if (role === 'transporter') { %>
+                    <li><a href="/transporter/info">Thông tin vận chuyển</a></li>
+                    <li><a href="/transporter/transport">Vận chuyển</a></li>
+                    <li><a href="/transporter/history">Lịch sử</a></li>
+                <% } else if (role === 'retailer') { %>
+                    <li><a href="/retailer/info">Thông tin cửa hàng</a></li>
+                    <li><a href="/retailer/receive">Nhận hàng</a></li>
+                    <li><a href="/retailer/sell">Bán lẻ</a></li>
+                    <li><a href="/retailer/history">Lịch sử</a></li>
+                <% } else if (role === 'admin') { %>
+                    <li><a href="/admin/users">Quản lý người dùng</a></li>
+                    <li><a href="/admin/lots">Quản lý lô</a></li>
+                    <li><a href="/admin/history">Lịch sử toàn chuỗi</a></li>
+                <% } %>
+                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Chào mừng <%= username %>!</h1>
+            </div>
+            <div class="card">
+                <h2>Dashboard</h2>
+                <p>Chào mừng bạn đến với hệ thống CoffeeTrace.</p>
+                <p>Vai trò: <%= role %></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            fetch('/logout', { method: 'POST' }) // Gọi route logout nếu cần
+                .then(() => {
+                    window.location.href = '/login.html';
+                });
+        }
+    </script>
+</body>
+</html>

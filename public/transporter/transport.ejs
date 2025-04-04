@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTrace - Vận chuyển</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>CoffeeTrace</h2>
+            <ul>
+                <li><a href="/dashboard">Trang chủ</a></li>
+                <li><a href="/transporter/info">Thông tin công ty</a></li>
+                <li><a href="#" class="active">Vận chuyển</a></li>
+                <li><a href="/transporter/history">Lịch sử</a></li>
+                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Chào mừng <%= username %>!</h1>
+            </div>
+            <div class="form-container active">
+                <h2>Nhập liệu vận chuyển</h2>
+                <form id="transporterTransportForm">
+                    <div class="form-group"><label>Mã QR/ID *</label><input type="text" name="qrCode" placeholder="VD: CF-123" required></div>
+                    <div class="form-group"><label>Ngày vận chuyển *</label><input type="date" name="date" required></div>
+                    <div class="form-group"><label>Điểm xuất phát *</label><input type="text" name="from" required></div>
+                    <div class="form-group"><label>Điểm đến *</label><input type="text" name="to" required></div>
+                    <div class="form-group"><label>Phương tiện *</label><select name="vehicle" required><option value="xetai">Xe tải</option><option value="container">Container</option></select></div>
+                    <div class="form-group"><label>Thời gian dự kiến (giờ)</label><input type="number" name="estimatedTime"></div>
+                    <div class="form-group"><label>Điều kiện vận chuyển</label><input type="text" name="condition" placeholder="VD: Nhiệt độ 20°C"></div>
+                    <div class="form-actions"><button type="submit" class="btn">Xác nhận</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('transporterTransportForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const qrCode = data.qrCode;
+            const token = localStorage.getItem('token');
+            const res = await fetch('/save-lot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                body: JSON.stringify({ qrCode, data, action: 'transport' })
+            });
+            const result = await res.json();
+            alert(result.message);
+        });
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

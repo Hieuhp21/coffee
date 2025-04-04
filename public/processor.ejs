@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTrace - Chế biến</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>CoffeeTrace</h2>
+            <ul>
+                <li><a href="/dashboard">Trang chủ</a></li>
+                <li><a href="#" class="active">Nhập liệu</a></li>
+                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Chào mừng <%= username %>!</h1>
+            </div>
+            <div class="form-container active">
+                <h2>Nhập liệu chế biến</h2>
+                <form id="processorForm">
+                    <div class="form-group"><label>Mã QR/ID *</label><input type="text" name="qrCode" placeholder="VD: CF-123" required></div>
+                    <div class="form-group"><label>Ngày nhận *</label><input type="date" name="date" required></div>
+                    <div class="form-group"><label>Khối lượng nhận (kg) *</label><input type="number" name="weightIn" required></div>
+                    <div class="form-group"><label>Phương pháp chế biến *</label><select name="method" required><option value="uot">Ướt</option><option value="kho">Khô</option></select></div>
+                    <div class="form-group"><label>Khối lượng sau chế biến (kg) *</label><input type="number" name="weightOut" required></div>
+                    <div class="form-actions"><button type="submit" class="btn">Xác nhận</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('processorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const qrCode = data.qrCode;
+            const token = localStorage.getItem('token');
+            const res = await fetch('/save-lot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                body: JSON.stringify({ qrCode, data })
+            });
+            const result = await res.json();
+            alert(result.message);
+        });
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

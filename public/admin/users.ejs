@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTrace - Quản lý người dùng</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>CoffeeTrace</h2>
+            <ul>
+                <li><a href="/dashboard">Trang chủ</a></li>
+                <li><a href="#" class="active">Quản lý người dùng</a></li>
+                <li><a href="/admin/lots">Quản lý lô</a></li>
+                <li><a href="/admin/history">Lịch sử toàn chuỗi</a></li>
+                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Chào mừng <%= username %>!</h1>
+            </div>
+            <div class="form-container active">
+                <h2>Thêm người dùng mới</h2>
+                <form id="addUserForm">
+                    <div class="form-group"><label>Tên đăng nhập *</label><input type="text" name="username" required></div>
+                    <div class="form-group"><label>Mật khẩu *</label><input type="password" name="password" required></div>
+                    <div class="form-group"><label>Vai trò *</label><select name="role" required>
+                        <option value="farmer">Nông dân</option>
+                        <option value="processor">Chế biến</option>
+                        <option value="packer">Đóng gói</option>
+                        <option value="transporter">Vận chuyển</option>
+                        <option value="retailer">Bán lẻ</option>
+                    </select></div>
+                    <div class="form-group"><label>Thông tin (JSON)</label><textarea name="info" placeholder='{"name": "Tên", "address": "Địa chỉ"}'></textarea></div>
+                    <div class="form-actions"><button type="submit" class="btn">Thêm</button></div>
+                </form>
+
+                <h2>Danh sách người dùng</h2>
+                <ul class="lot-list">
+                    <% users.forEach(user => { %>
+                        <li><%= user.username %> - <%= user.role %>: <%= user.info %></li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const token = localStorage.getItem('token');
+            const res = await fetch('/admin/add-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.message);
+            window.location.reload();
+        });
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

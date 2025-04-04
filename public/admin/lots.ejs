@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTrace - Quản lý lô</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>CoffeeTrace</h2>
+            <ul>
+                <li><a href="/dashboard">Trang chủ</a></li>
+                <li><a href="/admin/users">Quản lý người dùng</a></li>
+                <li><a href="#" class="active">Quản lý lô</a></li>
+                <li><a href="/admin/history">Lịch sử toàn chuỗi</a></li>
+                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Chào mừng <%= username %>!</h1>
+            </div>
+            <div class="form-container active">
+                <h2>Danh sách lô</h2>
+                <ul class="lot-list">
+                    <% lots.forEach(lot => { %>
+                        <li>
+                            <%= lot.qrCode %> - Trạng thái: <%= lot.status %>
+                            <ul>
+                                <li>Nông dân: <%= lot.farmerData || 'Chưa có' %></li>
+                                <li>Chế biến: <%= lot.processorData || 'Chưa có' %></li>
+                                <li>Đóng gói: <%= lot.packerData || 'Chưa có' %></li>
+                                <li>Vận chuyển: <%= lot.transporterData || 'Chưa có' %></li>
+                                <li>Bán lẻ: <%= lot.retailerData || 'Chưa có' %></li>
+                            </ul>
+                            <button onclick="deleteLot('<%= lot.qrCode %>')">Xóa</button>
+                        </li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function deleteLot(qrCode) {
+            if (!confirm(`Xóa lô ${qrCode}?`)) return;
+            const token = localStorage.getItem('token');
+            const res = await fetch('/admin/delete-lot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                body: JSON.stringify({ qrCode })
+            });
+            const result = await res.json();
+            alert(result.message);
+            window.location.reload();
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

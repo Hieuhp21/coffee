@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTrace - Lịch sử</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+        }
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 24px;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            color: #3498db;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        .header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .history-table th, .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .history-table th {
+            background-color: #3498db;
+            color: white;
+        }
+        .history-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .history-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .media-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .media-container img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .media-container video {
+            max-width: 300px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>CoffeeTrace</h2>
+            <ul>
+                <li><a href="/dashboard">Trang chủ</a></li>
+                <li><a href="/farmer/info">Thông tin nông dân</a></li>
+                <li><a href="/farmer/care">Chăm sóc</a></li>
+                <li><a href="/farmer/harvest">Thu hoạch</a></li>
+                <li><a href="/farmer/export">Xuất hàng</a></li>
+                <li><a href="/farmer/history" class="active">Lịch sử</a></li>
+                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Lịch sử - <%= username %></h1>
+            </div>
+            <div class="card">
+                <h2>Lịch sử hoạt động</h2>
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Mã QR</th>
+                            <th>Hành động</th>
+                            <th>Ngày giờ</th>
+                            <th>Dữ liệu</th>
+                            <th>Media</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% history.forEach(entry => { %>
+                            <% const data = JSON.parse(entry.data); %>
+                            <tr>
+                                <td><%= entry.qrCode %></td>
+                                <td><%= entry.action %></td>
+                                <td><%= entry.timestamp %></td>
+                                <td>
+                                    <% for (let key in data) { %>
+                                        <% if (key !== 'media') { %>
+                                            <%= key %>: <%= data[key] %><br>
+                                        <% } %>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (data.media) { %>
+                                        <div class="media-container">
+                                            <% 
+                                                const mediaItems = Array.isArray(data.media) ? data.media : [data.media];
+                                                mediaItems.forEach(media => { 
+                                            %>
+                                                <% if (media.type && media.type.startsWith('image/')) { %>
+                                                    <img src="<%= media.url %>" alt="<%= media.originalName %>">
+                                                <% } else if (media.type && media.type.startsWith('video/')) { %>
+                                                    <video controls>
+                                                        <source src="<%= media.url %>" type="<%= media.type %>">
+                                                        Trình duyệt không hỗ trợ video.
+                                                    </video>
+                                                <% } %>
+                                            <% }) %>
+                                        </div>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '/login.html';
+                });
+        }
+    </script>
+</body>
+</html>

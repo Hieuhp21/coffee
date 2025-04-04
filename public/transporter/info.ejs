@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTrace - Thông tin công ty vận chuyển</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>CoffeeTrace</h2>
+            <ul>
+                <li><a href="/dashboard">Trang chủ</a></li>
+                <li><a href="#" class="active">Thông tin công ty</a></li>
+                <li><a href="/transporter/transport">Vận chuyển</a></li>
+                <li><a href="/transporter/history">Lịch sử</a></li>
+                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Thông tin công ty vận chuyển</h1>
+            </div>
+            <div class="form-container active">
+                <h2>Cập nhật thông tin</h2>
+                <form id="transporterInfoForm">
+                    <div class="form-group"><label>Tên công ty *</label><input type="text" name="name" value="<%= info.name %>" required></div>
+                    <div class="form-group"><label>Địa chỉ *</label><input type="text" name="address" value="<%= info.address %>" required></div>
+                    <div class="form-actions"><button type="submit" class="btn">Lưu</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('transporterInfoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const token = localStorage.getItem('token');
+            const res = await fetch('/save-info', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.message);
+        });
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

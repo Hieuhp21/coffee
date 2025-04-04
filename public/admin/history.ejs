@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTrace - Lịch sử toàn chuỗi</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>CoffeeTrace</h2>
+            <ul>
+                <li><a href="/dashboard">Trang chủ</a></li>
+                <li><a href="/admin/users">Quản lý người dùng</a></li>
+                <li><a href="/admin/lots">Quản lý lô</a></li>
+                <li><a href="#" class="active">Lịch sử toàn chuỗi</a></li>
+                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Chào mừng <%= username %>!</h1>
+            </div>
+            <div class="form-container active">
+                <h2>Lịch sử toàn chuỗi</h2>
+                <ul class="lot-list">
+                    <% history.forEach(item => { %>
+                        <li><%= item.qrCode %> - <%= item.role %> - <%= item.action %> (<%= item.timestamp %>): <%= item.data %></li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

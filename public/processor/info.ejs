@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTrace - Thông tin cơ sở chế biến</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>CoffeeTrace</h2>
+            <ul>
+                <li><a href="/dashboard">Trang chủ</a></li>
+                <li><a href="#" class="active">Thông tin cơ sở</a></li>
+                <li><a href="/processor/quality">Kiểm tra chất lượng</a></li>
+                <li><a href="/processor/process">Chế biến</a></li>
+                <li><a href="/processor/storage">Lưu kho</a></li>
+                <li><a href="/processor/history">Lịch sử</a></li>
+                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Thông tin cơ sở chế biến</h1>
+            </div>
+            <div class="form-container active">
+                <h2>Cập nhật thông tin</h2>
+                <form id="processorInfoForm">
+                    <div class="form-group"><label>Tên cơ sở *</label><input type="text" name="name" value="<%= info.name %>" required></div>
+                    <div class="form-group"><label>Địa chỉ *</label><input type="text" name="address" value="<%= info.address %>" required></div>
+                    <div class="form-group"><label>Công suất (kg/ngày) *</label><input type="number" name="capacity" value="<%= info.capacity %>" required></div>
+                    <div class="form-actions"><button type="submit" class="btn">Lưu</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('processorInfoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const token = localStorage.getItem('token');
+            const res = await fetch('/save-info', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.message);
+        });
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

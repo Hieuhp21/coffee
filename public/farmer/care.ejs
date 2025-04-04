@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeTrace - Chăm sóc</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>CoffeeTrace</h2>
+            <ul>
+                <li><a href="/dashboard">Trang chủ</a></li>
+                <li><a href="/farmer/info">Thông tin nông dân</a></li>
+                <li><a href="/farmer/care" class="active">Chăm sóc</a></li>
+                <li><a href="/farmer/harvest">Thu hoạch</a></li>
+                <li><a href="/farmer/export">Xuất hàng</a></li>
+                <li><a href="/farmer/history">Lịch sử</a></li>
+                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Chăm sóc - <%= username %></h1>
+            </div>
+            <div class="card">
+                <h2>Nhập thông tin chăm sóc</h2>
+                <form id="careForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Mã QR lô:</label>
+                        <input type="text" name="qrCode" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày chăm sóc:</label>
+                        <input type="date" name="careDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ghi chú:</label>
+                        <textarea name="notes"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Ảnh/Video minh họa (chọn nhiều):</label>
+                        <input type="file" name="media" accept="image/*,video/*" multiple>
+                    </div>
+                    <input type="hidden" name="action" value="care">
+                    <button type="submit">Lưu</button>
+                </form>
+                <div id="formResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '/login.html';
+                });
+        }
+
+        document.getElementById('careForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            try {
+                const response = await fetch('/save-form-with-media', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    let mediaLinks = result.mediaUrls.map(url => `<p><a href="${url}" target="_blank">${url}</a></p>`).join('');
+                    document.getElementById('formResult').innerHTML = `
+                        <p>${result.message}</p>
+                        ${mediaLinks ? `<p>Media:</p>${mediaLinks}` : ''}
+                    `;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                document.getElementById('formResult').innerHTML = `<p>Lỗi: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
