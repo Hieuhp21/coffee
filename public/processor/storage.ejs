@@ -5,6 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoffeeTrace - Lưu kho</title>
     <link rel="stylesheet" href="/style.css">
+    <style>
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -25,32 +52,196 @@
                 <h1>Chào mừng <%= username %>!</h1>
             </div>
             <div class="form-container active">
-                <h2>Nhập liệu lưu kho</h2>
-                <form id="processorStorageForm">
-                    <div class="form-group"><label>Mã QR/ID *</label><input type="text" name="qrCode" placeholder="VD: CF-123" required></div>
-                    <div class="form-group"><label>Ngày nhập kho *</label><input type="date" name="date" required></div>
-                    <div class="form-group"><label>Vị trí kho *</label><input type="text" name="location" placeholder="VD: Kho A1" required></div>
-                    <div class="form-group"><label>Điều kiện bảo quản *</label><input type="text" name="condition" placeholder="VD: Nhiệt độ 25°C, độ ẩm 60%" required></div>
-                    <div class="form-actions"><button type="submit" class="btn">Xác nhận</button></div>
-                </form>
+                <div class="tab">
+                    <button class="tablinks" onclick="openTab(event, 'QualityCheck')" id="defaultOpen">Kiểm tra chất lượng sau chế biến</button>
+                    <button class="tablinks" onclick="openTab(event, 'Storage')">Lưu kho</button>
+                </div>
+
+                <!-- Form Kiểm tra chất lượng sau chế biến -->
+                <div id="QualityCheck" class="tabcontent">
+                    <h2>Nhập liệu kiểm tra chất lượng sau chế biến</h2>
+                    <form id="qualityCheckForm" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>Mã QR/ID *</label>
+                            <input type="text" name="qrCode" placeholder="VD: CF-123" required>
+                        </div>
+                       
+                        <div class="form-group">
+                            <label>Khối lượng sau chế biến (kg) *</label>
+                            <input type="number" name="weight" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày kiểm tra *</label>
+                            <input type="date" name="qualityCheckDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Đánh giá chất lượng</label>
+                            <select name="qualityEvaluation">
+                                <option value="">Chọn đánh giá</option>
+                                <option value="cao">Cao</option>
+                                <option value="trung binh">Trung bình</option>
+                                <option value="thap">Thấp</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Màu sắc sản phẩm</label>
+                            <input type="text" name="productColor" placeholder="VD: Nâu đậm, vàng nhạt...">
+                        </div>
+                        <div class="form-group">
+                            <label>Mùi vị</label>
+                            <input type="text" name="taste" placeholder="VD: Hương thơm mạnh, vị đắng nhẹ...">
+                        </div>
+                        <div class="form-group">
+                            <label>Kết quả kiểm định *</label>
+                            <select name="inspectionResult" required>
+                                <option value="dat">Đạt</option>
+                                <option value="khongdat">Không đạt</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Người phụ trách kiểm định *</label>
+                            <input type="text" name="inspector" placeholder="VD: Nguyễn Văn A" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Chứng nhận chất lượng (nếu có)</label>
+                            <input type="text" name="qualityCertification" placeholder="VD: UTZ, Rainforest Alliance...">
+                        </div>
+                        <div class="form-group">
+                            <label>Ghi chú</label>
+                            <textarea name="notes" placeholder="Mô tả thêm về chất lượng sau chế biến"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Ảnh/Video minh họa (chọn nhiều):</label>
+                            <input type="file" name="media" accept="image/*,video/*" multiple>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn">Xác nhận</button>
+                        </div>
+                    </form>
+                    <div id="qualityCheckResult"></div>
+                </div>
+
+                <!-- Form Lưu kho -->
+                <div id="Storage" class="tabcontent">
+                    <h2>Nhập liệu lưu kho</h2>
+                    <form id="processorStorageForm" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>Mã QR/ID *</label>
+                            <input type="text" name="qrCode" placeholder="VD: CF-123" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Khối lượng nhập kho (kg) *</label>
+                            <input type="number" name="weight" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phương pháp đóng gói</label>
+                            <select name="packagingMethod">
+                                <option value="">Chọn phương pháp</option>
+                                <option value="bao">Bao tải</option>
+                                <option value="thung">Thùng carton</option>
+                                <option value="pallet">Pallet</option>
+                                <option value="khac">Khác</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="otherPackagingMethod" style="display: none;">
+                            <label>Phương pháp đóng gói khác (nếu chọn "Khác"):</label>
+                            <input type="text" name="otherPackagingMethod" placeholder="Nhập phương pháp đóng gói khác">
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày đóng gói</label>
+                            <input type="date" name="packagingDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày nhập kho *</label>
+                            <input type="date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Vị trí kho *</label>
+                            <input type="text" name="location" placeholder="VD: Kho A1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Điều kiện bảo quản trong kho *</label>
+                            <input type="text" name="condition" placeholder="VD: Nhiệt độ 25°C, độ ẩm 60%" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ghi chú</label>
+                            <textarea name="notes" placeholder="Mô tả thêm về quá trình lưu kho"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Ảnh/Video minh họa (chọn nhiều):</label>
+                            <input type="file" name="media" accept="image/*,video/*" multiple>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn">Xác nhận</button>
+                        </div>
+                    </form>
+                    <div id="storageResult"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Tab switching
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        // Open default tab
+        document.getElementById("defaultOpen").click();
+
+        // Handle "Khác" option for Packaging Method
+        const packagingMethodSelect = document.querySelector('select[name="packagingMethod"]');
+        const otherPackagingMethodDiv = document.getElementById('otherPackagingMethod');
+        const otherPackagingMethodInput = otherPackagingMethodDiv.querySelector('input');
+        packagingMethodSelect.addEventListener('change', function() {
+            if (this.value === 'khac') {
+                otherPackagingMethodDiv.style.display = 'block';
+                otherPackagingMethodInput.setAttribute('required', 'true');
+            } else {
+                otherPackagingMethodDiv.style.display = 'none';
+                otherPackagingMethodInput.removeAttribute('required');
+            }
+        });
+
+        // Submit handler for Quality Check Form
+        document.getElementById('qualityCheckForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const qrCode = formData.get('qrCode');
+            const token = localStorage.getItem('token');
+            const res = await fetch('/save-form-with-media', {
+                method: 'POST',
+                headers: { 'Authorization': token },
+                body: formData
+            });
+            const result = await res.json();
+            document.getElementById('qualityCheckResult').innerHTML = `<p>${result.message}</p>`;
+        });
+
+        // Submit handler for Storage Form
         document.getElementById('processorStorageForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-            const qrCode = data.qrCode;
+            const qrCode = formData.get('qrCode');
             const token = localStorage.getItem('token');
-            const res = await fetch('/save-lot', {
+            const res = await fetch('/save-form-with-media', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                body: JSON.stringify({ qrCode, data, action: 'storage' })
+                headers: { 'Authorization': token },
+                body: formData
             });
             const result = await res.json();
-            alert(result.message);
+            document.getElementById('storageResult').innerHTML = `<p>${result.message}</p>`;
         });
 
         function logout() {

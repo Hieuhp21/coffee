@@ -1,100 +1,191 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CoffeeTrace - Thông tin nông trại</title>
     <link rel="stylesheet" href="/style.css" />
-  </head>
-  <body>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
     <div class="container">
-      <div class="sidebar">
-        <h2>CoffeeTrace</h2>
-        <ul>
-          <li><a href="/dashboard">Trang chủ</a></li>
-          <li><a href="#" class="active">Thông tin nông trại</a></li>
-          <li><a href="/farmer/care">Chăm sóc</a></li>
-          <li><a href="/farmer/harvest">Thu hoạch</a></li>
-          <li><a href="/farmer/export">Xuất hàng</a></li>
-          <li><a href="/farmer/history">Lịch sử</a></li>
-          <li><a href="#" onclick="logout()">Đăng xuất</a></li>
-        </ul>
-      </div>
-      <div class="main-content">
-        <div class="header">
-          <h1>Thông tin nông trại</h1>
+        <div class="sidebar">
+            <h2>CoffeeTrace</h2>
+            <ul>
+                <li><a href="/dashboard">Trang chủ</a></li>
+                <li><a href="#" class="active">Thông tin nông trại</a></li>
+                <li><a href="/farmer/care">Chăm sóc</a></li>
+                <li><a href="/farmer/harvest">Thu hoạch</a></li>
+                <li><a href="/farmer/export">Xuất hàng</a></li>
+                <li><a href="/farmer/history">Lịch sử</a></li>
+                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+            </ul>
         </div>
-        <div class="form-container active">
-          <h2>Cập nhật thông tin</h2>
-          <form id="farmerInfoForm">
-            <div class="form-group">
-              <label>Tên nông dân *</label
-              ><input
-                type="text"
-                name="name"
-                value="<%= info.name %>"
-                required
-              />
+        <div class="main-content">
+            <div class="header">
+                <h1>Thông tin nông trại</h1>
             </div>
-            <div class="form-group">
-              <label>Địa chỉ *</label
-              ><input
-                type="text"
-                name="address"
-                value="<%= info.address %>"
-                required
-              />
+            <div class="form-container active">
+                <h2>Cập nhật thông tin</h2>
+                <form id="farmerInfoForm">
+                    <div class="form-group">
+                        <label>Tên nông dân *</label>
+                        <input type="text" name="name" value="<%= info.name %>" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Địa chỉ *</label>
+                        <input type="text" name="address" value="<%= info.address %>" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Diện tích (ha) *</label>
+                        <input type="number" name="area" value="<%= info.area %>" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Số cây cà phê</label>
+                        <input type="number" name="treeCount" value="<%= info.treeCount || '' %>" />
+                    </div>
+                    <div class="form-group">
+                        <label>Mã lô đất *</label>
+                        <input type="text" name="landLotCode" placeholder="VD: LD-001" value="<%= info.landLotCode || '' %>" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Tọa độ GPS (vĩ độ, kinh độ) *</label>
+                        <input type="text" name="gpsCoordinates" id="gpsCoordinates" placeholder="VD: 12.345, 109.876" value="<%= info.gpsCoordinates || '' %>" required />
+                        <div id="map"></div>
+                        <button type="button" id="getCurrentLocation">Lấy lại vị trí hiện tại</button>
+                        <small>(Kéo marker trên bản đồ hoặc nhập thủ công nếu cần)</small>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn">Lưu</button>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-              <label>Diện tích (ha) *</label
-              ><input
-                type="number"
-                name="area"
-                value="<%= info.area %>"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label>Số cây cà phê</label
-              ><input
-                type="number"
-                name="treeCount"
-                value="<%= info.treeCount || '' %>"
-              />
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="btn">Lưu</button>
-            </div>
-          </form>
         </div>
-      </div>
     </div>
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <script>
-      document
-        .getElementById("farmerInfoForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          const data = Object.fromEntries(formData);
-          const token = localStorage.getItem("token"); // Lấy token từ localStorage ở client
-          const res = await fetch("/save-info", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Gửi token trong header
-            },
-            body: JSON.stringify(data),
-          });
-          const result = await res.json();
-          alert(result.message);
+        let map;
+        let marker;
+        const fallbackLocation = { lat: 10.7769, lng: 106.7009 }; // TP.HCM làm fallback
+
+        // Khởi tạo bản đồ Leaflet với OpenStreetMap và Esri Satellite
+        function initMap(lat, lng) {
+            map = L.map('map', { zoomControl: true }).setView([lat, lng], 15);
+
+            // Layer OpenStreetMap (bản đồ đường phố)
+            const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Layer Esri World Imagery (chế độ vệ tinh)
+            const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+                maxZoom: 19
+            });
+
+            // Thêm marker
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+            // Cập nhật tọa độ khi kéo marker
+            marker.on('dragend', function(e) {
+                const position = marker.getLatLng();
+                document.getElementById('gpsCoordinates').value = `${position.lat.toFixed(6)}, ${position.lng.toFixed(6)}`;
+            });
+
+            // Cập nhật input tọa độ ban đầu
+            document.getElementById('gpsCoordinates').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+            // Thêm bộ điều khiển layer để chuyển đổi giữa OSM và vệ tinh
+            const baseLayers = {
+                "Bản đồ đường phố": osmLayer,
+                "Chế độ vệ tinh": satelliteLayer
+            };
+            L.control.layers(baseLayers).addTo(map);
+        }
+
+        // Khởi tạo bản đồ với vị trí hiện tại hoặc dữ liệu server
+        window.onload = function() {
+            const existingCoords = document.getElementById('gpsCoordinates').value;
+            if (existingCoords) {
+                const [lat, lng] = existingCoords.split(',').map(Number);
+                initMap(lat, lng);
+            } else if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        initMap(pos.lat, pos.lng);
+                    },
+                    () => {
+                        // Fallback nếu không lấy được vị trí
+                        initMap(fallbackLocation.lat, fallbackLocation.lng);
+                    }
+                );
+            } else {
+                // Fallback nếu trình duyệt không hỗ trợ geolocation
+                initMap(fallbackLocation.lat, fallbackLocation.lng);
+            }
+        };
+
+        // Lấy lại vị trí hiện tại khi nhấn nút
+        document.getElementById('getCurrentLocation').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        map.setView([pos.lat, pos.lng], 15);
+                        marker.setLatLng([pos.lat, pos.lng]);
+                        document.getElementById('gpsCoordinates').value = `${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`;
+                    },
+                    (error) => {
+                        alert('Không thể lấy vị trí hiện tại. Vui lòng kéo marker hoặc nhập thủ công. Mã lỗi: ' + error.message);
+                    }
+                );
+            } else {
+                alert('Trình duyệt không hỗ trợ định vị GPS. Vui lòng kéo marker hoặc nhập thủ công.');
+            }
         });
 
-      function logout() {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        window.location.href = "/login.html";
-      }
+        // Xử lý submit form
+        document.getElementById('farmerInfoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const token = localStorage.getItem('token');
+            const res = await fetch('/save-info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.message);
+        });
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        }
     </script>
-  </body>
+</body>
 </html>

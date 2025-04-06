@@ -26,29 +26,99 @@
             </div>
             <div class="form-container active">
                 <h2>Nhập liệu kiểm tra chất lượng</h2>
-                <form id="processorQualityForm">
-                    <div class="form-group"><label>Mã QR/ID *</label><input type="text" name="qrCode" placeholder="VD: CF-123" required></div>
-                    <div class="form-group"><label>Ngày kiểm tra *</label><input type="date" name="date" required></div>
-                    <div class="form-group"><label>Tỷ lệ hạt lỗi (%)</label><input type="number" name="defectRate" step="0.1"></div>
-                    <div class="form-group"><label>Độ ẩm (%)</label><input type="number" name="moisture" step="0.1"></div>
-                    <div class="form-group"><label>Kết quả</label><select name="result"><option value="dat">Đạt</option><option value="khongdat">Không đạt</option></select></div>
-                    <div class="form-actions"><button type="submit" class="btn">Xác nhận</button></div>
+                <form id="processorQualityForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Mã QR/ID *</label>
+                        <input type="text" name="qrCode" placeholder="VD: CF-123" required>
+                    </div>
+                 
+                    <div class="form-group">
+                        <label>Số lượng (kg) *</label>
+                        <input type="number" name="quantity" step="0.1" placeholder="VD: 500" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày kiểm tra *</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tỷ lệ hạt lỗi (%)</label>
+                        <input type="number" name="defectRate" step="0.1" min="0" max="100" placeholder="VD: 2.5">
+                    </div>
+                    <div class="form-group">
+                        <label>Độ ẩm (%)</label>
+                        <input type="number" name="moisture" step="0.1" min="0" max="100" placeholder="VD: 12.5">
+                    </div>
+                    <div class="form-group">
+                        <label>Kích thước hạt (sàng)</label>
+                        <input type="text" name="screenSize" placeholder="VD: S18, S16...">
+                    </div>
+                    <div class="form-group">
+                        <label>Màu sắc hạt</label>
+                        <select name="beanColor">
+                            <option value="">Chọn màu sắc</option>
+                            <option value="xanh">Xanh</option>
+                            <option value="vàng nhạt">Vàng nhạt</option>
+                            <option value="nâu nhạt">Nâu nhạt</option>
+                            <option value="nâu đậm">Nâu đậm</option>
+                            <option value="khác">Khác</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="otherBeanColor" style="display: none;">
+                        <label>Màu sắc khác (nếu chọn "Khác"):</label>
+                        <input type="text" name="otherBeanColor" placeholder="Nhập màu sắc khác">
+                    </div>
+                    <div class="form-group">
+                        <label>Chứng nhận chất lượng (nếu có)</label>
+                        <input type="text" name="qualityCertification" placeholder="VD: UTZ, Rainforest Alliance...">
+                    </div>
+                    <div class="form-group">
+                        <label>Kết quả *</label>
+                        <select name="result" required>
+                            <option value="dat">Đạt</option>
+                            <option value="khongdat">Không đạt</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ghi chú</label>
+                        <textarea name="notes" placeholder="Mô tả thêm về chất lượng hoặc vấn đề phát sinh"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Ảnh/Video minh họa (chọn nhiều):</label>
+                        <input type="file" name="media" accept="image/*,video/*" multiple>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn">Xác nhận</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
     <script>
+        // Handle "Khác" option for Bean Color
+        const beanColorSelect = document.querySelector('select[name="beanColor"]');
+        const otherBeanColorDiv = document.getElementById('otherBeanColor');
+        const otherBeanColorInput = otherBeanColorDiv.querySelector('input');
+        beanColorSelect.addEventListener('change', function() {
+            if (this.value === 'khác') {
+                otherBeanColorDiv.style.display = 'block';
+                otherBeanColorInput.setAttribute('required', 'true');
+            } else {
+                otherBeanColorDiv.style.display = 'none';
+                otherBeanColorInput.removeAttribute('required');
+            }
+        });
+
         document.getElementById('processorQualityForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
             const qrCode = data.qrCode;
             const token = localStorage.getItem('token');
-            const res = await fetch('/save-lot', {
+            const res = await fetch('/save-form-with-media', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                body: JSON.stringify({ qrCode, data, action: 'quality' })
+                headers: { 'Authorization': token }, // Remove 'Content-Type' since FormData sets it automatically
+                body: formData // Send FormData directly to support file uploads
             });
             const result = await res.json();
             alert(result.message);

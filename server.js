@@ -386,7 +386,7 @@ app.post(
         filename: file.filename,
         originalName: file.originalname,
         type: file.mimetype,
-        url: `/public/uploads/${file.filename}`,
+        url: `/uploads/${file.filename}`,
       }));
     }
 

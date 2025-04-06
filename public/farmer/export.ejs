@@ -1,88 +1,109 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CoffeeTrace - Xuất hàng</title>
-    <link rel="stylesheet" href="/style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
     <div class="container">
-        <div class="sidebar">
-            <h2>CoffeeTrace</h2>
-            <ul>
-                <li><a href="/dashboard">Trang chủ</a></li>
-                <li><a href="/farmer/info">Thông tin nông dân</a></li>
-                <li><a href="/farmer/care">Chăm sóc</a></li>
-                <li><a href="/farmer/harvest">Thu hoạch</a></li>
-                <li><a href="/farmer/export" class="active">Xuất hàng</a></li>
-                <li><a href="/farmer/history">Lịch sử</a></li>
-                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
-            </ul>
+      <div class="sidebar">
+        <h2>CoffeeTrace</h2>
+        <ul>
+          <li><a href="/dashboard">Trang chủ</a></li>
+          <li><a href="/farmer/info">Thông tin nông dân</a></li>
+          <li><a href="/farmer/care">Chăm sóc</a></li>
+          <li><a href="/farmer/harvest">Thu hoạch</a></li>
+          <li><a href="/farmer/export" class="active">Xuất hàng</a></li>
+          <li><a href="/farmer/history">Lịch sử</a></li>
+          <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+        </ul>
+      </div>
+      <div class="main-content">
+        <div class="header">
+          <h1>Xuất hàng - <%= username %></h1>
         </div>
-        <div class="main-content">
-            <div class="header">
-                <h1>Xuất hàng - <%= username %></h1>
+        <div class="card">
+          <h2>Nhập thông tin xuất hàng</h2>
+          <form id="exportForm" enctype="multipart/form-data">
+            <div class="form-group">
+              <label>Mã QR lô:</label>
+              <input type="text" name="qrCode" required />
             </div>
-            <div class="card">
-                <h2>Nhập thông tin xuất hàng</h2>
-                <form id="exportForm" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label>Mã QR lô:</label>
-                        <input type="text" name="qrCode" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Ngày xuất hàng:</label>
-                        <input type="date" name="exportDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Đơn vị nhận:</label>
-                        <input type="text" name="receiver" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Ảnh/Video minh họa (chọn nhiều):</label>
-                        <input type="file" name="media" accept="image/*,video/*" multiple>
-                    </div>
-                    <input type="hidden" name="action" value="export">
-                    <button type="submit">Lưu</button>
-                </form>
-                <div id="formResult"></div>
+            <div class="form-group">
+              <label>Ngày xuất hàng:</label>
+              <input type="date" name="exportDate" required />
             </div>
+            <div class="form-group">
+              <label>Đơn vị nhận:</label>
+              <input type="text" name="receiver" required />
+            </div>
+            <div class="form-group">
+              <label>Số lượng(kg):</label>
+              <input type="number" name="yield" required />
+            </div>
+            <div class="form-group">
+              <label>Note:</label>
+              <input type="text" name="note" />
+            </div>
+            <div class="form-group">
+              <label>Ảnh/Video minh họa (chọn nhiều):</label>
+              <input
+                type="file"
+                name="media"
+                accept="image/*,video/*"
+                multiple
+              />
+            </div>
+            <input type="hidden" name="action" value="export" />
+            <button type="submit">Lưu</button>
+          </form>
+          <div id="formResult"></div>
         </div>
+      </div>
     </div>
 
     <script>
-        function logout() {
-            fetch('/logout', { method: 'POST' })
-                .then(() => {
-                    window.location.href = '/login.html';
-                });
-        }
+      function logout() {
+        fetch("/logout", { method: "POST" }).then(() => {
+          window.location.href = "/login.html";
+        });
+      }
 
-        document.getElementById('exportForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
+      document
+        .getElementById("exportForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
 
-            try {
-                const response = await fetch('/save-form-with-media', { // Thay /save-lot bằng /save-form-with-media
-                    method: 'POST',
-                    body: formData,
-                    credentials: 'include'
-                });
-                const result = await response.json();
-                if (response.ok) {
-                    let mediaLinks = result.mediaUrls.map(url => `<p><a href="${url}" target="_blank">${url}</a></p>`).join('');
-                    document.getElementById('formResult').innerHTML = `
+          try {
+            const response = await fetch("/save-form-with-media", {
+              // Thay /save-lot bằng /save-form-with-media
+              method: "POST",
+              body: formData,
+              credentials: "include",
+            });
+            const result = await response.json();
+            if (response.ok) {
+              let mediaLinks = result.mediaUrls
+                .map(
+                  (url) => `<p><a href="${url}" target="_blank">${url}</a></p>`
+                )
+                .join("");
+              document.getElementById("formResult").innerHTML = `
                         <p>${result.message}</p>
-                        ${mediaLinks ? `<p>Media:</p>${mediaLinks}` : ''}
+                        ${mediaLinks ? `<p>Media:</p>${mediaLinks}` : ""}
                     `;
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                document.getElementById('formResult').innerHTML = `<p>Lỗi: ${error.message}</p>`;
+            } else {
+              throw new Error(result.message);
             }
+          } catch (error) {
+            document.getElementById(
+              "formResult"
+            ).innerHTML = `<p>Lỗi: ${error.message}</p>`;
+          }
         });
     </script>
-</body>
+  </body>
 </html>

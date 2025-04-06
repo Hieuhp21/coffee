@@ -36,11 +36,74 @@
                         <input type="date" name="careDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Ghi chú:</label>
-                        <textarea name="notes"></textarea>
+                        <label>Phương pháp canh tác:</label>
+                        <select name="farmingMethod" id="farmingMethod" required>
+                            <option value="">Chọn phương pháp</option>
+                            <option value="hữu cơ">Hữu cơ</option>
+                            <option value="truyền thống">Truyền thống</option>
+                            <option value="bán hữu cơ">Bán hữu cơ</option>
+                            <option value="khác">Khác</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="otherFarmingMethod" style="display: none;">
+                        <label>Phương pháp khác (nếu chọn "Khác"):</label>
+                        <input type="text" name="otherFarmingMethod" placeholder="Nhập phương pháp canh tác khác">
                     </div>
                     <div class="form-group">
-                        <label>Ảnh/Video minh họa (chọn nhiều):</label>
+                        <label>Loại đất:</label>
+                        <select name="soilType">
+                            <option value="">Chọn loại đất</option>
+                            <option value="đất đỏ bazan">Đất đỏ bazan</option>
+                            <option value="đất sét">Đất sét</option>
+                            <option value="đất pha cát">Đất pha cát</option>
+                            
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Loại phân bón:</label>
+                        <input type="text" name="fertilizerType" placeholder="Ví dụ: NPK, phân hữu cơ...">
+                    </div>
+                    <div class="form-group">
+                        <label>Liều lượng phân bón:</label>
+                        <input type="text" name="fertilizerAmount" placeholder="Ví dụ: 2kg/cây">
+                    </div>
+                    <div class="form-group">
+                        <label>Lượng nước tưới:</label>
+                        <input type="text" name="waterAmount" placeholder="Ví dụ: 20 lít/cây">
+                    </div>
+                    <div class="form-group">
+                        <label>Tần suất tưới nước:</label>
+                        <input type="text" name="wateringFrequency" placeholder="Ví dụ: 2 ngày/lần">
+                    </div>
+                    <div class="form-group">
+                        <label>Tình trạng cây:</label>
+                        <select name="plantCondition" required>
+                            <option value="">Chọn tình trạng</option>
+                            <option value="tốt">Tốt</option>
+                            <option value="bình thường">Bình thường</option>
+                            <option value="kém">Kém</option>
+                            <option value="sâu bệnh">Có sâu bệnh</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Sâu bệnh (nếu có):</label>
+                        <input type="text" name="pests" placeholder="Ví dụ: rệp sáp, sâu đục thân...">
+                    </div>
+                    <div class="form-group">
+                        <label>Biện pháp xử lý sâu bệnh:</label>
+                        <input type="text" name="pestControl" placeholder="Ví dụ: phun thuốc, bẫy sinh học...">
+                    </div>
+                 
+                    <div class="form-group">
+                        <label>Các hoạt động chăm sóc:</label>
+                        <textarea name="careActivities" placeholder="Ví dụ: tỉa cành, làm cỏ, bón phân..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Ghi chú:</label>
+                        <textarea name="notes" placeholder="Mô tả thêm về tình trạng hoặc hoạt động chăm sóc"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Ảnh/Video minh họa:</label>
                         <input type="file" name="media" accept="image/*,video/*" multiple>
                     </div>
                     <input type="hidden" name="action" value="care">
@@ -58,6 +121,21 @@
                     window.location.href = '/login.html';
                 });
         }
+
+        // Hiển thị/ẩn trường "Phương pháp khác" dựa trên lựa chọn
+        const farmingMethodSelect = document.getElementById('farmingMethod');
+        const otherFarmingMethodDiv = document.getElementById('otherFarmingMethod');
+        const otherFarmingMethodInput = otherFarmingMethodDiv.querySelector('input');
+
+        farmingMethodSelect.addEventListener('change', function() {
+            if (this.value === 'khác') {
+                otherFarmingMethodDiv.style.display = 'block';
+                otherFarmingMethodInput.setAttribute('required', 'true');
+            } else {
+                otherFarmingMethodDiv.style.display = 'none';
+                otherFarmingMethodInput.removeAttribute('required');
+            }
+        });
 
         document.getElementById('careForm').addEventListener('submit', async (e) => {
             e.preventDefault();
