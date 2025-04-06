@@ -137,7 +137,7 @@ app.post("/login", (req, res) => {
       }
       if (result) {
         const token = jwt.sign({ id: user.id, role: user.role }, SECRET_KEY, {
-          expiresIn: "1h",
+          expiresIn: "25h",
         });
         console.log("Token tạo:", token);
         res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
@@ -401,7 +401,7 @@ app.post(
         process: "Chế biến",
         storage: "Lưu kho",
         pack: "Đóng gói",
-        transport: "Vận chuyển",
+        transport: "Xuất khẩu",
         receive: "Nhận hàng",
         sell: "Bán lẻ",
       };

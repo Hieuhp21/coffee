@@ -129,7 +129,7 @@
                 <table class="history-table">
                     <thead>
                         <tr>
-                            <th>Mã QR</th>
+                            <th>Mã lô</th>
                             <th>Hành động</th>
                             <th>Ngày giờ</th>
                             <th>Dữ liệu</th>
@@ -142,7 +142,22 @@
                             <tr>
                                 <td><%= entry.qrCode %></td>
                                 <td><%= entry.action %></td>
-                                <td><%= entry.timestamp %></td>
+                                <td>
+                                    <%
+                                      const timestamp = new Date(entry.timestamp);
+                                      const formattedDate = timestamp.toLocaleString('vi-VN', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        second: '2-digit',
+                                        hour12: false
+                                      });
+                                    %>
+                                    <%= formattedDate %>
+                                  </td>
+                                  
                                 <td>
                                     <% for (let key in data) { %>
                                         <% if (key !== 'media') { %>

@@ -1,61 +1,249 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CoffeeTrace - Thông tin cơ sở chế biến</title>
-    <link rel="stylesheet" href="/style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+  </head>
+  <body>
     <div class="container">
-        <div class="sidebar">
-            <h2>CoffeeTrace</h2>
-            <ul>
-                <li><a href="/dashboard">Trang chủ</a></li>
-                <li><a href="#" class="active">Thông tin cơ sở</a></li>
-                <li><a href="/processor/quality">Kiểm tra chất lượng</a></li>
-                <li><a href="/processor/process">Chế biến</a></li>
-                <li><a href="/processor/storage">Lưu kho</a></li>
-                <li><a href="/processor/history">Lịch sử</a></li>
-                <li><a href="#" onclick="logout()">Đăng xuất</a></li>
-            </ul>
+      <div class="sidebar">
+        <h2>CoffeeTrace</h2>
+        <ul>
+          <li><a href="/dashboard">Trang chủ</a></li>
+          <li><a href="#" class="active">Thông tin cơ sở</a></li>
+          <li><a href="/processor/quality">Kiểm tra chất lượng</a></li>
+          <li><a href="/processor/process">Chế biến</a></li>
+          <li><a href="/processor/storage">Lưu kho</a></li>
+          <li><a href="/processor/history">Lịch sử</a></li>
+          <li><a href="#" onclick="logout()">Đăng xuất</a></li>
+        </ul>
+      </div>
+      <div class="main-content">
+        <div class="header">
+          <h1>Thông tin cơ sở chế biến</h1>
         </div>
-        <div class="main-content">
-            <div class="header">
-                <h1>Thông tin cơ sở chế biến</h1>
+        <div class="form-container active">
+          <h2>Cập nhật thông tin</h2>
+          <form id="processorInfoForm">
+            <div class="form-group">
+              <label for="name">Tên cơ sở chế biến *</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value="<%= info.name %>"
+                required
+              />
             </div>
-            <div class="form-container active">
-                <h2>Cập nhật thông tin</h2>
-                <form id="processorInfoForm">
-                    <div class="form-group"><label>Tên cơ sở *</label><input type="text" name="name" value="<%= info.name %>" required></div>
-                    <div class="form-group"><label>Địa chỉ *</label><input type="text" name="address" value="<%= info.address %>" required></div>
-                    <div class="form-group"><label>Công suất (kg/ngày) *</label><input type="number" name="capacity" value="<%= info.capacity %>" required></div>
-                    <div class="form-actions"><button type="submit" class="btn">Lưu</button></div>
-                </form>
+
+            <div class="form-group">
+              <label for="establishmentYear">Năm thành lập *</label>
+              <input
+                type="number"
+                id="establishmentYear"
+                name="establishmentYear"
+                value="<%= info.establishmentYear || '' %>"
+                required
+              />
             </div>
+
+            <div class="form-group">
+              <label for="address">Địa chỉ cơ sở *</label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                value="<%= info.address %>"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="license">Mã số thuế *</label>
+              <input
+                type="text"
+                id="taxcode"
+                name="taxcode"
+                value="<%= info.taxcode || '' %>"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="license">Giấy phép hoạt động *</label>
+              <input
+                type="text"
+                id="license"
+                name="license"
+                value="<%= info.license || '' %>"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="safetyCertificate"
+                >Chứng nhận an toàn thực phẩm *</label
+              >
+              <input
+                type="text"
+                id="safetyCertificate"
+                name="safetyCertificate"
+                value="<%= info.safetyCertificate || '' %>"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="environmentalCertificate"
+                >Chứng nhận môi trường (nếu có)</label
+              >
+              <input
+                type="text"
+                id="environmentalCertificate"
+                name="environmentalCertificate"
+                value="<%= info.environmentalCertificate || '' %>"
+              />
+            </div>
+
+          
+            <div class="form-group">
+                <label>Tọa độ GPS (vĩ độ, kinh độ) *</label>
+                <input type="text" name="gpsCoordinates" id="gpsCoordinates" placeholder="VD: 12.345, 109.876" value="<%= info.gpsCoordinates || '' %>" required />
+                <div id="map"></div>
+                <button type="button" id="getCurrentLocation">Lấy lại vị trí hiện tại</button>
+                <small>(Kéo marker trên bản đồ hoặc nhập thủ công nếu cần)</small>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn">Lưu thông tin</button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <script>
-        document.getElementById('processorInfoForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-            const token = localStorage.getItem('token');
-            const res = await fetch('/save-info', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                body: JSON.stringify(data)
+        let map;
+        let marker;
+        const fallbackLocation = { lat: 10.7769, lng: 106.7009 }; // TP.HCM làm fallback
+
+        // Khởi tạo bản đồ Leaflet với OpenStreetMap và Esri Satellite
+        function initMap(lat, lng) {
+            map = L.map('map', { zoomControl: true }).setView([lat, lng], 15);
+
+            // Layer OpenStreetMap (bản đồ đường phố)
+            const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Layer Esri World Imagery (chế độ vệ tinh)
+            const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+                maxZoom: 19
             });
-            const result = await res.json();
-            alert(result.message);
+
+            // Thêm marker
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+            // Cập nhật tọa độ khi kéo marker
+            marker.on('dragend', function(e) {
+                const position = marker.getLatLng();
+                document.getElementById('gpsCoordinates').value = `${position.lat.toFixed(6)}, ${position.lng.toFixed(6)}`;
+            });
+
+            // Cập nhật input tọa độ ban đầu
+            document.getElementById('gpsCoordinates').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+            // Thêm bộ điều khiển layer để chuyển đổi giữa OSM và vệ tinh
+            const baseLayers = {
+                "Bản đồ đường phố": osmLayer,
+                "Chế độ vệ tinh": satelliteLayer
+            };
+            L.control.layers(baseLayers).addTo(map);
+        }
+
+        // Khởi tạo bản đồ với vị trí hiện tại hoặc dữ liệu server
+        window.onload = function() {
+            const existingCoords = document.getElementById('gpsCoordinates').value;
+            if (existingCoords) {
+                const [lat, lng] = existingCoords.split(',').map(Number);
+                initMap(lat, lng);
+            } else if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        initMap(pos.lat, pos.lng);
+                    },
+                    () => {
+                        // Fallback nếu không lấy được vị trí
+                        initMap(fallbackLocation.lat, fallbackLocation.lng);
+                    }
+                );
+            } else {
+                // Fallback nếu trình duyệt không hỗ trợ geolocation
+                initMap(fallbackLocation.lat, fallbackLocation.lng);
+            }
+        };
+
+        // Lấy lại vị trí hiện tại khi nhấn nút
+        document.getElementById('getCurrentLocation').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        map.setView([pos.lat, pos.lng], 15);
+                        marker.setLatLng([pos.lat, pos.lng]);
+                        document.getElementById('gpsCoordinates').value = `${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`;
+                    },
+                    (error) => {
+                        alert('Không thể lấy vị trí hiện tại. Vui lòng kéo marker hoặc nhập thủ công. Mã lỗi: ' + error.message);
+                    }
+                );
+            } else {
+                alert('Trình duyệt không hỗ trợ định vị GPS. Vui lòng kéo marker hoặc nhập thủ công.');
+            }
         });
 
-        function logout() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('role');
-            window.location.href = '/login.html';
-        }
+      document
+        .getElementById("processorInfoForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const data = Object.fromEntries(formData);
+          const token = localStorage.getItem("token");
+          const res = await fetch("/save-info", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+            },
+            body: JSON.stringify(data),
+          });
+          const result = await res.json();
+          alert(result.message);
+        });
+
+      function logout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        window.location.href = "/login.html";
+      }
     </script>
-</body>
+  </body>
 </html>

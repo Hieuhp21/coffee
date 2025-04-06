@@ -62,17 +62,20 @@
                     <h2>Nhập liệu kiểm tra chất lượng sau chế biến</h2>
                     <form id="qualityCheckForm" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label>Mã QR/ID *</label>
+                            <label>Mã lô *</label>
                             <input type="text" name="qrCode" placeholder="VD: CF-123" required>
-                        </div>
-                       
-                        <div class="form-group">
-                            <label>Khối lượng sau chế biến (kg) *</label>
-                            <input type="number" name="weight" step="0.1" required>
                         </div>
                         <div class="form-group">
                             <label>Ngày kiểm tra *</label>
                             <input type="date" name="qualityCheckDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Khối lượng thành phẩm (kg) *</label>
+                            <input type="number" name="weight" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Loại cafe thành phẩm *</label>
+                            <input type="text" name="finishedCoffee" required>
                         </div>
                         <div class="form-group">
                             <label>Đánh giá chất lượng</label>
@@ -84,12 +87,8 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Màu sắc sản phẩm</label>
-                            <input type="text" name="productColor" placeholder="VD: Nâu đậm, vàng nhạt...">
-                        </div>
-                        <div class="form-group">
-                            <label>Mùi vị</label>
-                            <input type="text" name="taste" placeholder="VD: Hương thơm mạnh, vị đắng nhẹ...">
+                            <label>Tiêu chuẩn chất lượng</label>
+                            <input type="text" name="qualityStandards" placeholder="VD: SCA 85+...">
                         </div>
                         <div class="form-group">
                             <label>Kết quả kiểm định *</label>
@@ -111,10 +110,11 @@
                             <textarea name="notes" placeholder="Mô tả thêm về chất lượng sau chế biến"></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Ảnh/Video minh họa (chọn nhiều):</label>
+                            <label>Ảnh/Video minh họa:</label>
                             <input type="file" name="media" accept="image/*,video/*" multiple>
                         </div>
                         <div class="form-actions">
+                            <input type="hidden" name="action" value="qualityCheck" />
                             <button type="submit" class="btn">Xác nhận</button>
                         </div>
                     </form>
@@ -148,16 +148,8 @@
                             <input type="text" name="otherPackagingMethod" placeholder="Nhập phương pháp đóng gói khác">
                         </div>
                         <div class="form-group">
-                            <label>Ngày đóng gói</label>
-                            <input type="date" name="packagingDate">
-                        </div>
-                        <div class="form-group">
                             <label>Ngày nhập kho *</label>
                             <input type="date" name="date" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Vị trí kho *</label>
-                            <input type="text" name="location" placeholder="VD: Kho A1" required>
                         </div>
                         <div class="form-group">
                             <label>Điều kiện bảo quản trong kho *</label>
@@ -168,10 +160,11 @@
                             <textarea name="notes" placeholder="Mô tả thêm về quá trình lưu kho"></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Ảnh/Video minh họa (chọn nhiều):</label>
+                            <label>Ảnh/Video minh họa :</label>
                             <input type="file" name="media" accept="image/*,video/*" multiple>
                         </div>
                         <div class="form-actions">
+                            <input type="hidden" name="action" value="storage" />
                             <button type="submit" class="btn">Xác nhận</button>
                         </div>
                     </form>

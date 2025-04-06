@@ -26,12 +26,17 @@
             <div class="form-container active">
                 <h2>Nhập liệu nhận hàng</h2>
                 <form id="retailerReceiveForm">
-                    <div class="form-group"><label>Mã QR/ID *</label><input type="text" name="qrCode" placeholder="VD: CF-123" required></div>
+                    <div class="form-group"><label>Mã lô *</label><input type="text" name="qrCode" placeholder="VD: CF-123" required></div>
                     <div class="form-group"><label>Ngày nhận hàng *</label><input type="date" name="date" required></div>
-                    <div class="form-group"><label>Số lượng nhận (bao) *</label><input type="number" name="received" required></div>
+                    <div class="form-group"><label>Số lượng nhận  *</label><input type="text" name="received" required></div>
                     <div class="form-group"><label>Đơn vị cung cấp *</label><input type="text" name="supplier" placeholder="VD: Công ty ABC" required></div>
                     <div class="form-group"><label>Tình trạng hàng</label><select name="condition"><option value="tot">Tốt</option><option value="hong">Hỏng</option></select></div>
                     <div class="form-group"><label>Ghi chú</label><textarea name="note"></textarea></div>
+                    <div class="form-group">
+                        <label>Ảnh/Video minh họa :</label>
+                        <input type="file" name="media" accept="image/*,video/*" multiple>
+                    </div>
+                    <input type="hidden" name="action" value="receive" />
                     <div class="form-actions"><button type="submit" class="btn">Xác nhận</button></div>
                 </form>
             </div>
@@ -45,7 +50,7 @@
             const data = Object.fromEntries(formData);
             const qrCode = data.qrCode;
             const token = localStorage.getItem('token');
-            const res = await fetch('/save-lot', {
+            const res = await fetch('/save-form-with-media', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': token },
                 body: JSON.stringify({ qrCode, data, action: 'receive' })

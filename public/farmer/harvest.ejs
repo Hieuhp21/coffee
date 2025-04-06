@@ -62,7 +62,7 @@
                     <h2>Nhập thông tin thu hoạch</h2>
                     <form id="harvestForm" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label>Mã QR lô:</label>
+                            <label>Mã lô:</label>
                             <input type="text" name="qrCode" required>
                         </div>
                         <div class="form-group">
@@ -105,11 +105,11 @@
                     <h2>Nhập thông tin sơ chế & bảo quản tại nông trại</h2>
                     <form id="processingForm" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label>Mã QR lô:</label>
+                            <label>Mã lô:</label>
                             <input type="text" name="qrCode" required>
                         </div>
                         <div class="form-group">
-                            <label>Ngày bắt đầu sơ chế:</label>
+                            <label>Ngày sơ chế:</label>
                             <input type="date" name="processingStartDate" required>
                         </div>
                         <div class="form-group">
@@ -130,26 +130,13 @@
                             <label>Thời gian sơ chế (ngày):</label>
                             <input type="number" name="processingDuration" placeholder="Ví dụ: 3">
                         </div>
+                       
                         <div class="form-group">
-                            <label>Địa điểm phơi/lên men:</label>
-                            <input type="text" name="processingLocation" placeholder="Ví dụ: sân phơi, bể lên men...">
+                            <label>Nhiệt độ bảo quản :</label>
+                            <input type="text" name="temperature" placeholder="Nhiệt độ bảo quản">
                         </div>
                         <div class="form-group">
-                            <label>Thời tiết trong quá trình sơ chế:</label>
-                            <select name="weatherDuringProcessing">
-                                <option value="">Chọn thời tiết</option>
-                                <option value="nắng">Nắng</option>
-                                <option value="mưa">Mưa</option>
-                                <option value="mây">Mây</option>
-                                <option value="gió">Gió</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Địa điểm bảo quản tạm thời:</label>
-                            <input type="text" name="tempStorageLocation" placeholder="Ví dụ: kho, bao tải...">
-                        </div>
-                        <div class="form-group">
-                            <label>Thời gian bảo quản tạm thời (ngày):</label>
+                            <label>Thời gian bảo quản (ngày):</label>
                             <input type="number" name="tempStorageDuration" placeholder="Ví dụ: 5">
                         </div>
                         <div class="form-group">
@@ -161,7 +148,7 @@
                             <textarea name="notes" placeholder="Mô tả thêm về sơ chế hoặc bảo quản tại nông trại"></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Ảnh/Video minh họa (chọn nhiều):</label>
+                            <label>Ảnh/Video minh họa :</label>
                             <input type="file" name="media" accept="image/*,video/*" multiple>
                         </div>
                         <input type="hidden" name="action" value="processing">

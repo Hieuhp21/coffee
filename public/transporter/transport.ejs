@@ -13,7 +13,7 @@
             <ul>
                 <li><a href="/dashboard">Trang chủ</a></li>
                 <li><a href="/transporter/info">Thông tin công ty</a></li>
-                <li><a href="#" class="active">Vận chuyển</a></li>
+                <li><a href="#" class="active">Xuất khẩu</a></li>
                 <li><a href="/transporter/history">Lịch sử</a></li>
                 <li><a href="#" onclick="logout()">Đăng xuất</a></li>
             </ul>
@@ -23,17 +23,69 @@
                 <h1>Chào mừng <%= username %>!</h1>
             </div>
             <div class="form-container active">
-                <h2>Nhập liệu vận chuyển</h2>
+                <h2>Nhập liệu xuất khẩu</h2>
                 <form id="transporterTransportForm">
-                    <div class="form-group"><label>Mã QR/ID *</label><input type="text" name="qrCode" placeholder="VD: CF-123" required></div>
-                    <div class="form-group"><label>Ngày vận chuyển *</label><input type="date" name="date" required></div>
-                    <div class="form-group"><label>Điểm xuất phát *</label><input type="text" name="from" required></div>
-                    <div class="form-group"><label>Điểm đến *</label><input type="text" name="to" required></div>
-                    <div class="form-group"><label>Phương tiện *</label><select name="vehicle" required><option value="xetai">Xe tải</option><option value="container">Container</option></select></div>
-                    <div class="form-group"><label>Thời gian dự kiến (giờ)</label><input type="number" name="estimatedTime"></div>
-                    <div class="form-group"><label>Điều kiện vận chuyển</label><input type="text" name="condition" placeholder="VD: Nhiệt độ 20°C"></div>
-                    <div class="form-actions"><button type="submit" class="btn">Xác nhận</button></div>
+                    <div class="form-group">
+                        <label>Mã Lô *</label>
+                        <input type="text" name="qrCode" placeholder="VD: CF-123" required>
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Ngày xuất khẩu *</label>
+                        <input type="date" name="exportDate" required>
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Nguồn gốc *</label>
+                        <input type="text" name="fromLocation" required>
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Nước nhập khẩu *</label>
+                        <input type="text" name="toLocation" required>
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Phương thức vận chuyển</label>
+                        <input type="text" name="transportMethod" placeholder="VD: đường thủy, hàng không,..">
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Đơn vị vận chuyển</label>
+                        <input type="text" name="transportCompany" placeholder="">
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Số hóa đơn thương mại</label>
+                        <input type="text" name="invoiceNumber" placeholder="">
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Số vận đơn (B/L)</label>
+                        <input type="text" name="billOfLading" placeholder="">
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Chứng từ kèm theo</label>
+                        <input type="text" name="attachedDocuments">
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Ghi chú</label>
+                        <textarea name="notes" placeholder="Mô tả thêm về quá trình xuất khẩu"></textarea>
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Ảnh/Video minh họa :</label>
+                        <input type="file" name="media" accept="image/*,video/*" multiple>
+                    </div>
+                
+                    <div class="form-actions">
+                        <input type="hidden" name="action" value="export" />
+                        <button type="submit" class="btn">Xác nhận</button>
+                    </div>
                 </form>
+                
             </div>
         </div>
     </div>
@@ -45,7 +97,7 @@
             const data = Object.fromEntries(formData);
             const qrCode = data.qrCode;
             const token = localStorage.getItem('token');
-            const res = await fetch('/save-lot', {
+            const res = await fetch('/save-form-with-media', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': token },
                 body: JSON.stringify({ qrCode, data, action: 'transport' })

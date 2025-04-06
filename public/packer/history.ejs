@@ -22,15 +22,64 @@
         <div class="main-content">
             <div class="header">
                 <h1>Chào mừng <%= username %>!</h1>
-            </div>
-            <div class="form-container active">
+              </div>
+              <div class="card">
                 <h2>Lịch sử hoạt động</h2>
-                <ul class="lot-list">
-                    <% history.forEach(item => { %>
-                        <li><%= item.qrCode %> - <%= item.action %> (<%= item.timestamp %>): <%= item.data %></li>
+                <table class="history-table">
+                  <thead>
+                    <tr>
+                      <th>Mã lô</th>
+                      <th>Hành động</th>
+                      <th>Ngày giờ</th>
+                      <th>Dữ liệu</th>
+                      <th>Media</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% history.forEach(item => { %> <% let data = item.data; %> <% if
+                    (typeof data === 'string') { data = JSON.parse(data); } %>
+                    <tr>
+                      <td><%= item.qrCode %></td>
+                      <td><%= item.action %></td>
+                      <td>
+                        <% const timestamp = new Date(item.timestamp); const
+                        formattedDate = timestamp.toLocaleString('vi-VN', { day:
+                        '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit',
+                        minute: '2-digit', second: '2-digit', hour12: false }); %> <%=
+                        formattedDate %>
+                      </td>
+      
+                      <td>
+                        <% if (typeof data === 'object' && data !== null) { %> <% for
+                        (let key in data) { %> <% if (key !== 'media') { %> <%= key
+                        %>: <%= data[key] %><br />
+                        <% } %> <% } %> <% } else { %> <%= item.data %> <% } %>
+                      </td>
+                      <td>
+                        <% if (data && data.media) { %>
+                        <div class="media-container">
+                          <% const mediaItems = Array.isArray(data.media) ? data.media
+                          : [data.media]; mediaItems.forEach(media => { %> <% if
+                          (media.type && media.type.startsWith('image/')) { %>
+                          <img
+                            src="<%= media.url %>"
+                            alt="<%= media.originalName || 'Hình ảnh' %>"
+                          />
+                          <% } else if (media.type && media.type.startsWith('video/'))
+                          { %>
+                          <video controls>
+                            <source src="<%= media.url %>" type="<%= media.type %>" />
+                            Trình duyệt không hỗ trợ video.
+                          </video>
+                          <% } %> <% }) %>
+                        </div>
+                        <% } %>
+                      </td>
+                    </tr>
                     <% }) %>
-                </ul>
-            </div>
+                  </tbody>
+                </table>
+              </div>
         </div>
     </div>
 
